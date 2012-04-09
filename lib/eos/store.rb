@@ -15,12 +15,20 @@ class Store
     @body ||= page.body
   end
   
+  def name
+    page.search('div:nth(2)').text.scan(/[^(]+/).first.strip
+  end
+  
   def product_ids
     @product_ids ||= body.scan(/sc_pid=(\d+)/).flatten.uniq.map(&:to_i)
   end
   
   def store_products
     @store_products ||= self.product_ids.map {|pid| StoreProduct.new(self.agent, self.store_id, pid) }
+  end
+  
+  def store_products_like(name)
+    store_products.select {|sp| sp.name =~ /#{name}/ }
   end
   
   def autosell!

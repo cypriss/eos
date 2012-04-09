@@ -23,7 +23,20 @@ class StoreProduct
   end
   
   def cost
-    page.search(".sspi_details:nth(5)").text.strip.gsub(/\$/, '').to_f
+    @cost ||= begin
+      txt = page.search(".sspi_details:nth(5)").text.strip.gsub(/\$/, '')
+      
+      multiplier = 1
+      if txt =~ /k/i
+        multiplier = 1000
+      elsif txt =~ /m/i
+        multiplier = 1000000
+      elsif txt =~ /g/i
+        multiplier = 1000000000
+      end
+      
+      txt.to_f * multiplier
+    end
   end
   
   def name
@@ -35,16 +48,33 @@ class StoreProduct
   end
   
   def avg_price
-    html = page.body
-    
-    match = html.match /Average selling price \(World\).+?(\d+(\.\d+)?)/
-    (match && match[1].to_f) || 0
+    @avg_price ||= begin
+      html = page.body
+      
+      match = html.match /Average selling price \(World\).+?(\d+(\.\d+)? [kmg])/i
+
+      if match && match[1]
+        txt = match[1]
+        multiplier = 1
+        if txt =~ /k/i
+          multiplier = 1000
+        elsif txt =~ /m/i
+          multiplier = 1000000
+        elsif txt =~ /g/i
+          multiplier = 1000000000
+        end
+
+        txt.to_f * multiplier
+      else
+        0
+      end
+    end
   end
   
   def autosell!
     return unless has_inventory?
     c = [2.0 * cost, avg_price].max
-    if c > 0
+    if c > 2
       sell!(c)
     end
   end
