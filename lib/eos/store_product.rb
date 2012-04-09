@@ -19,7 +19,7 @@ class StoreProduct
   end
   
   def quantity
-    page.search(".sspi_details:nth(4)").text.strip.to_f
+    has_inventory? ? page.search(".sspi_details:nth(4)").text.strip.to_f : 0.0
   end
   
   def cost

@@ -54,5 +54,17 @@ class Importer
       resp = agent.get("/eos/market-import-buy.php?market_prod_id=#{cheapest[:buyable_id]}&buy_num=#{quantity}")
       puts "Status = #{resp.code}"
     end
+    true
+  end
+  
+  def buy_these(quantity, product_ids = [])
+    products.group_by {|prod| prod[:name] }.each_pair do |name, prods|
+      cheapest = prods.min {|a, b| a[:price] <=> b[:price] }
+      next unless product_ids.include?(cheapest[:product_id])
+      puts "Buying #{quantity} of #{cheapest[:name]}"
+      resp = agent.get("/eos/market-import-buy.php?market_prod_id=#{cheapest[:buyable_id]}&buy_num=#{quantity}")
+      puts "Status = #{resp.code}"
+    end
+    true
   end
 end

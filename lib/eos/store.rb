@@ -38,6 +38,17 @@ class Store
     true
   end
   
+  def import_low
+    store_products.select {|sp| !sp.has_inventory? || sp.quantity < 100 }.each do |sp|
+      puts "Going to import: #{sp.name} qty=#{sp.quantity} pid=#{sp.product_id}"
+    end
+    
+    pids = store_products.select {|sp| !sp.has_inventory? || sp.quantity < 100 }.map {|sp| sp.product_id }
+    
+    self.importer.buy_these(100, pids)
+    true
+  end
+  
   def import_uri
     page.links.select {|p| p.uri.to_s =~ /market-import-store\.php/ }.first.uri
   end

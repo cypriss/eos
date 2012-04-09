@@ -22,7 +22,6 @@ class Eos
   end
   
   def login!
-    #def get(uri, parameters = [], referer = nil, headers = {})
     login = agent.get("http://www.ratjoy.com/login.php?username=#{username}&password=#{password}&nocache=#{rand}")
     eos = agent.get("/eos/")
   end
