@@ -51,7 +51,7 @@ class StoreProduct
     @avg_price ||= begin
       html = page.body
       
-      match = html.match /Average selling price \(World\).+?(\d+(\.\d+)? [kmg])/i
+      match = html.match /Average selling price \(World\).+?(\d+(\.\d+)?( [kmg])?)/i
 
       if match && match[1]
         txt = match[1]

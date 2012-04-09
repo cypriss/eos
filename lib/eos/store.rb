@@ -35,6 +35,7 @@ class Store
     store_products.each do |sp|
       sp.autosell!
     end
+    true
   end
   
   def import_uri
