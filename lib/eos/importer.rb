@@ -34,7 +34,7 @@ class Importer
             
             prod[:name] = tr.search('td:nth(3)').text
             prod[:quality] = tr.search('td:nth(4)').text.to_i
-            prod[:price] = tr.search('td:nth(5)').text.gsub(/\$/, '').to_f
+            prod[:price] = tr.search('td:nth(5)').text.gsub(/\$/, '').gsub(/,/, '').to_f
             prod[:buyable_id] = inner_html.scan(/buyFromMarket\((\d+),/).flatten.uniq.map(&:to_i).first
             prod[:product_id] = inner_html.scan(/pid=(\d+)/).flatten.uniq.map(&:to_i).first
             
@@ -57,12 +57,21 @@ class Importer
     true
   end
   
-  def buy_these(quantity, product_ids = [])
+  def buy_these(quantity, product_ids = [], opts = {})
     products.group_by {|prod| prod[:name] }.each_pair do |name, prods|
       cheapest = prods.min {|a, b| a[:price] <=> b[:price] }
       next unless product_ids.include?(cheapest[:product_id])
-      puts "Buying #{quantity} of #{cheapest[:name]}"
-      resp = agent.get("/eos/market-import-buy.php?market_prod_id=#{cheapest[:buyable_id]}&buy_num=#{quantity}")
+      
+      qty = quantity
+      
+      if opts[:min_buy_cost]
+        if (qty * cheapest[:price]) < opts[:min_buy_cost]
+          qty = (opts[:min_buy_cost] / cheapest[:price]).to_i
+        end
+      end
+      
+      puts "Buying #{qty} of #{cheapest[:name]}"
+      resp = agent.get("/eos/market-import-buy.php?market_prod_id=#{cheapest[:buyable_id]}&buy_num=#{qty}")
       puts "Status = #{resp.code}"
     end
     true

@@ -16,7 +16,11 @@ class Store
   end
   
   def name
-    page.search('div:nth(2)').text.scan(/[^(]+/).first.strip
+    expanding? ? nil : page.search('div:nth(2)').text.scan(/[^(]+/).first.strip
+  end
+  
+  def expanding?
+    body =~ /stores-expand-status\.php/
   end
   
   def product_ids
@@ -38,14 +42,16 @@ class Store
     true
   end
   
-  def import_low
-    store_products.select {|sp| !sp.has_inventory? || sp.quantity < 100 }.each do |sp|
-      puts "Going to import: #{sp.name} qty=#{sp.quantity} pid=#{sp.product_id}"
+  def import_low(trigger_qty, buy_qty, amnt = nil)
+    sps = store_products.select {|sp| !sp.has_inventory? || sp.quantity < trigger_qty }
+    
+    sps.each do |sp|
+      puts "Going to import: #{sp.name} cur qty=#{sp.quantity} pid=#{sp.product_id}"
     end
     
-    pids = store_products.select {|sp| !sp.has_inventory? || sp.quantity < 100 }.map {|sp| sp.product_id }
+    pids = sps.map {|sp| sp.product_id }
     
-    self.importer.buy_these(100, pids)
+    self.importer.buy_these(buy_qty, pids, {:min_buy_cost => amnt})
     true
   end
   

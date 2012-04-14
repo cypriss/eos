@@ -19,7 +19,22 @@ class StoreProduct
   end
   
   def quantity
-    has_inventory? ? page.search(".sspi_details:nth(4)").text.strip.to_f : 0.0
+    if has_inventory?
+      txt = page.search(".sspi_details:nth(4)").text.strip
+      
+      multiplier = 1
+      if txt =~ /k/i
+        multiplier = 1000
+      elsif txt =~ /m/i
+        multiplier = 1000000
+      elsif txt =~ /g/i
+        multiplier = 1000000000
+      end
+      
+      txt.to_f * multiplier
+    else
+      0.0
+    end
   end
   
   def cost

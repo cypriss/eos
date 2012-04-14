@@ -22,7 +22,7 @@ class Eos
   end
   
   def login!
-    login = agent.get("http://www.ratjoy.com/login.php?username=#{username}&password=#{password}&nocache=#{rand}")
+    login = agent.post("http://www.ratjoy.com/login.php", {:username => "Jonathan", :password => "netbooks1", :nocache => rand})
     eos = agent.get("/eos/")
   end
   
