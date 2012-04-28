@@ -4,15 +4,21 @@ require 'eos'
 
 eos = Eos.load
 s = eos.stores.select {|z| z.name == "Sports Store" }.first
-s.import_low(1000, 500, 50_000)
+s.import_low(3000, 500, 50_000)
 
 s = eos.stores.select {|z| z.name == "Hardware Store" }.first
-s.import_low(1000, 500, 50_000) if s
+s.import_low(3000, 500, 50_000) if s
 
 s = eos.stores.select {|z| z.name == "Apparel Store" }.first
-s.import_low(1000, 500, 50_000) if s
+s.import_low(3000, 500, 50_000) if s
 
 s = eos.stores.select {|z| z.name == "Electronics Store" }.first
-s.import_low(1000, 500, 50_000) if s
+s.import_low(3000, 500, 50_000) if s
+
+s = eos.stores.select {|z| z.name == "Gas Station" }.first
+s.import_low(3000, 500, 50_000) if s
+
+s = eos.stores.select {|z| z.name == "Toy Store" }.first
+s.import_low(3000, 500, 50_000) if s
 
 puts `git pull`
